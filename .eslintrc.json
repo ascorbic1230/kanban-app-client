@@ -28,6 +28,10 @@
             2,
             "tab"
         ],
+        "react/jsx-indent-props": [
+            2,
+            "tab"
+        ],
         "@typescript-eslint/indent": [
             2,
             "tab"
