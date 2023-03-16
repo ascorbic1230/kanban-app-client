@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { Box } from '@mui/material';
 import Loading from '../components/common/Loading';
 import Sidebar from '../components/Sidebar';
 
+import { setUser } from '../redux/features/userSlice';
 import authUtils from '../utils/authUtils';
 
 function AppLayout(): JSX.Element {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -19,7 +23,7 @@ function AppLayout(): JSX.Element {
 			if (!user) {
 				navigate('/login');
 			} else {
-				// TODO: save user info
+				dispatch(setUser(user));
 				setLoading(false);
 			}
 		};
