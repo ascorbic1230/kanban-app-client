@@ -1,5 +1,5 @@
-const logoDark = require('./images/logo-dark.png');
-const appIcon = require('./images/favicon.png');
+import logoDark from './images/logo-dark.png';
+import appIcon from './images/favicon.png';
 
 const assets = {
 	images: { logoDark, appIcon },
