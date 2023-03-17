@@ -5,6 +5,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { SnackbarProvider } from 'notistack';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import AuthLayout from './layout/AuthLayout';
@@ -13,6 +14,7 @@ import AppLayout from './layout/AppLayout';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Board from './pages/Board';
 import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
@@ -23,6 +25,14 @@ const router = createBrowserRouter([
 			{
 				path: '/',
 				element: <Home />,
+			},
+			{
+				path: '/boards',
+				element: <Home />,
+			},
+			{
+				path: '/boards/:boardId',
+				element: <Board />,
 			},
 		],
 	},
@@ -48,8 +58,10 @@ function App(): JSX.Element {
 
 	return (
 		<ThemeProvider theme={theme}>
-			<CssBaseline />
-			<RouterProvider router={router} />
+			<SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} preventDuplicate>
+				<CssBaseline />
+				<RouterProvider router={router} />
+			</SnackbarProvider>
 		</ThemeProvider>
 	);
 }

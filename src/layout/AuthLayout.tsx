@@ -25,7 +25,7 @@ function AuthLayout(): JSX.Element {
 		};
 
 		checkAuth();
-	}, []);
+	}, [navigate]);
 
 	return (
 		loading

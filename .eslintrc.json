@@ -5,6 +5,7 @@
     },
     "extends": [
         "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
         "standard-with-typescript",
         "airbnb",
         "airbnb-typescript"
@@ -49,6 +50,9 @@
             {
                 "ImportDeclaration": "never"
             }
-        ]
+        ],
+        "@typescript-eslint/restrict-template-expressions": 0,
+        "react/jsx-props-no-spreading": 0,
+        "max-len": 0
     }
 }

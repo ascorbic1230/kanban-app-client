@@ -29,7 +29,7 @@ function AppLayout(): JSX.Element {
 		};
 
 		checkAuth();
-	}, []);
+	}, [dispatch, navigate]);
 
 	return (
 		loading
