@@ -2,6 +2,14 @@ import axiosClient from './axiosClient';
 
 import type { Board } from '../utils/types';
 
+interface UpdateBoardType {
+	boardId: string
+	title?: string
+	description?: string
+	favourite?: boolean
+	icon?: string
+}
+
 const boardApi = {
 	createBoard: async () => (
 		axiosClient.post('/boards')
@@ -14,6 +22,14 @@ const boardApi = {
 	),
 	updateBoardsPosition: async (boards: Board[]) => (
 		axiosClient.put('/boards', { boards })
+	),
+	updateBoard: async (params: UpdateBoardType) => (
+		axiosClient.put(`/boards/${params.boardId}`, {
+			title: params.title,
+			description: params.description,
+			favourite: params.favourite,
+			icon: params.icon,
+		})
 	),
 };
 
