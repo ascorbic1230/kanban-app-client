@@ -37,6 +37,9 @@ const boardApi = {
 			icon: params.icon,
 		})
 	),
+	deleteBoard: async (boardId: string) => (
+		axiosClient.delete(`/boards/${boardId}`)
+	),
 };
 
 export default boardApi;

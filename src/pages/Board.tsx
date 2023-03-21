@@ -121,6 +121,29 @@ function Board(): JSX.Element {
 		}
 	};
 
+	const handleDeleteBoard = async (): Promise<void> => {
+		try {
+			await boardApi.deleteBoard(boardId ?? '');
+
+			const newList = boards.filter((item) => item.id !== boardId);
+			dispatch(setBoards(newList));
+
+			if (isFavourite) {
+				const newFavouriteList = favouriteList.filter((item) => item.id !== boardId);
+				dispatch(setFavouritesBoards(newFavouriteList));
+			}
+
+			if (newList.length > 0) {
+				navigate(`/boards/${newList[0].id}`);
+			} else {
+				navigate('/boards');
+			}
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.log(error);
+		}
+	};
+
 	return (
 		<>
 			<Box
@@ -138,7 +161,7 @@ function Board(): JSX.Element {
 							: <StarBorderOutlined />
 					}
 				</IconButton>
-				<IconButton color="error">
+				<IconButton color="error" onClick={() => { handleDeleteBoard(); }}>
 					<DeleteOutlined />
 				</IconButton>
 			</Box>
