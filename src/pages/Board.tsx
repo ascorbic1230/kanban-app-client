@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Box, IconButton, TextField, Button, Typography, Divider } from '@mui/material';
+import { Box, IconButton, TextField } from '@mui/material';
 import { StarOutlined, StarBorderOutlined, DeleteOutlined } from '@mui/icons-material';
+import Kanban from '../components/Kanban';
 import EmojiPicker from '../components/common/EmojiPicker';
 
 import boardApi from '../api/boardApi';
@@ -195,23 +196,7 @@ function Board(): JSX.Element {
 					/>
 				</Box>
 				<Box>
-					<Box
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-						}}
-					>
-						<Button>
-							Add section
-						</Button>
-						<Typography variant="body2" fontWeight="700">
-							{sections.length}
-							{' '}
-							Section(s)
-						</Typography>
-					</Box>
-					<Divider sx={{ margin: '10px 0' }} />
+					<Kanban sections={sections} boardId={boardId} />
 				</Box>
 			</Box>
 		</>
