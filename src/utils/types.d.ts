@@ -53,6 +53,7 @@ export interface Section {
 	id: string
 	board: string
 	title: string
+	tasks?: Task[]
 }
 
 export interface Task {

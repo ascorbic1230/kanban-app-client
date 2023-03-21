@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Box, Button, Typography, Divider, TextField, IconButton } from '@mui/material';
+import { Box, Button, Typography, Divider, TextField, IconButton, Card } from '@mui/material';
 import { AddOutlined, DeleteOutlined } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import StrictModeDroppable from './common/StrictModeDroppable';
 
 import sectionApi from '../api/sectionApi';
+import taskApi from '../api/taskApi';
 import type { Section } from '../utils/types';
 
 interface PropsType {
@@ -63,8 +64,62 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 		}, TIME_OUT);
 	};
 
-	const onDragEnd = (): void => {
+	const handleCreateTask = async (sectionId: string): Promise<void> => {
+		try {
+			const res = await taskApi.createTask(boardId, sectionId);
 
+			const newData = data.map((item) => {
+				if (item.id === sectionId) {
+					const tasks = [res.data.task, ...(item.tasks ?? [])];
+					return { ...item, tasks };
+				}
+				return item;
+			});
+
+			setData(newData);
+		} catch (error: any) {
+			enqueueSnackbar(error.message, { variant: 'error' });
+		}
+	};
+
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+	const onDragEnd = async ({ source, destination }: { source: any, destination: any }) => {
+		if (!destination) return;
+
+		const sourceColIndex = data.findIndex((i) => i.id === source.droppableId);
+		const destinationColIndex = data.findIndex((i) => i.id === destination.droppableId);
+
+		const sourceCol = data[sourceColIndex];
+		const destinationCol = data[destinationColIndex];
+
+		const sourceSectionId = sourceCol.id;
+		const destinationSectionId = destinationCol.id;
+
+		const sourceTasks = [...(sourceCol.tasks ?? [])];
+		const destinationTasks = [...(destinationCol.tasks ?? [])];
+
+		if (source.droppableId !== destination.droppableId) {
+			const [removed] = sourceTasks.splice(source.index, 1);
+			destinationTasks.splice(destination.index, 0, removed);
+			data[sourceColIndex].tasks = sourceTasks;
+			data[destinationColIndex].tasks = destinationTasks;
+		} else {
+			const [removed] = destinationTasks.splice(source.index, 1);
+			destinationTasks.splice(destination.index, 0, removed);
+			data[destinationColIndex].tasks = destinationTasks;
+		}
+
+		try {
+			await taskApi.updateTaskPosition(boardId, {
+				resourceList: sourceTasks,
+				resourceSectionId: sourceSectionId,
+				destinationList: destinationTasks,
+				destinationSectionId,
+			});
+		} catch (error: any) {
+			// eslint-disable-next-line no-console
+			console.log(error);
+		}
 	};
 
 	return (
@@ -86,7 +141,7 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 				</Typography>
 			</Box>
 			<Divider sx={{ margin: '10px 0' }} />
-			<DragDropContext onDragEnd={onDragEnd}>
+			<DragDropContext onDragEnd={(e) => { onDragEnd(e); }}>
 				<Box
 					sx={{
 						display: 'flex',
@@ -111,6 +166,7 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 														display: 'flex',
 														alignItems: 'center',
 														justifyContent: 'space-between',
+														marginBottom: '10px',
 													}}
 												>
 													<TextField
@@ -131,6 +187,7 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 															color: 'gray',
 															'&:hover': { color: 'green' },
 														}}
+														onClick={() => { handleCreateTask(section.id); }}
 													>
 														<AddOutlined />
 													</IconButton>
@@ -145,7 +202,32 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 														<DeleteOutlined />
 													</IconButton>
 												</Box>
-												{/* Task */}
+												{
+													(section.tasks ?? []).map((task, index) => (
+														<Draggable key={task.id} draggableId={task.id} index={index}>
+															{
+																// eslint-disable-next-line @typescript-eslint/no-shadow
+																(provided, snapshot) => (
+																	<Card
+																		ref={provided.innerRef}
+																		{...provided.draggableProps}
+																		{...provided.dragHandleProps}
+																		sx={{
+																			padding: '10px',
+																			marginBottom: '10px',
+																			cursor: snapshot.isDragging ? 'grab' : 'pointer!important',
+																		}}
+																	>
+																		<Typography>
+																			{task.title === '' ? 'Untitled' : task.title}
+																		</Typography>
+																	</Card>
+																)
+															}
+														</Draggable>
+													))
+												}
+												{provided.placeholder}
 											</Box>
 										)
 									}
