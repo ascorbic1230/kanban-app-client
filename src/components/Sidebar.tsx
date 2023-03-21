@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import { Drawer, List, ListItem, Box, Typography, IconButton, ListItemButton } from '@mui/material';
 import { LogoutOutlined, AddBoxOutlined } from '@mui/icons-material';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import FavouriteList from './FavouriteList';
 import StrictModeDroppable from './common/StrictModeDroppable';
 
 import boardApi from '../api/boardApi';
@@ -40,17 +41,17 @@ function Sidebar(): JSX.Element {
 		};
 
 		getBoards();
-	}, [boardId, dispatch, enqueueSnackbar, navigate]);
+	}, [dispatch, enqueueSnackbar]);
 
 	useEffect(() => {
 		setBoardsData(boards);
 	}, [boards]);
 
 	useEffect(() => {
-		if (boardsData && boardsData.length > 0 && boardId === undefined) {
-			navigate(`/boards/${boardsData[0].id}`);
+		if (boards && boards.length > 0 && boardId === undefined) {
+			navigate(`/boards/${boards[0].id}`);
 		}
-	}, [boardsData, boardId, navigate]);
+	}, [boards, boardId, navigate]);
 
 	useEffect(() => {
 		const activeIdx = (boardsData ?? []).findIndex((i: Board) => i.id === boardId);
@@ -136,20 +137,7 @@ function Sidebar(): JSX.Element {
 						</IconButton>
 					</Box>
 				</ListItem>
-				<ListItem sx={{ marginTop: '10px' }}>
-					<Box
-						sx={{
-							width: '100%',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-						}}
-					>
-						<Typography variant="body2" fontWeight="700">
-							Favourites
-						</Typography>
-					</Box>
-				</ListItem>
+				<FavouriteList />
 				<ListItem sx={{ marginTop: '10px' }}>
 					<Box
 						sx={{

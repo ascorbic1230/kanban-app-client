@@ -7,10 +7,12 @@ import { Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
 import boardApi from '../api/boardApi';
-import { setCurrentBoard } from '../redux/features/boardSlice';
+import { setCurrentBoard, fetchAllBoards } from '../redux/features/boardSlice';
+
+import type { AppDispatch } from '../redux/store';
 
 function Home(): JSX.Element {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -22,6 +24,7 @@ function Home(): JSX.Element {
 		try {
 			const res = await boardApi.createBoard();
 			dispatch(setCurrentBoard(res.data.board));
+			dispatch(fetchAllBoards());
 			navigate(`/boards/${res.data.board.id}`);
 		} catch (error: any) {
 			enqueueSnackbar(error.message, { variant: 'error' });

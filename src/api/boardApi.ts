@@ -20,8 +20,14 @@ const boardApi = {
 	getAll: async () => (
 		axiosClient.get('/boards')
 	),
+	getAllFavourites: async () => (
+		axiosClient.get('/boards/favourites')
+	),
 	updateBoardsPosition: async (boards: Board[]) => (
 		axiosClient.put('/boards', { boards })
+	),
+	updateFavouriteBoardsPosition: async (boards: Board[]) => (
+		axiosClient.put('/boards/favourites', { boards })
 	),
 	updateBoard: async (params: UpdateBoardType) => (
 		axiosClient.put(`/boards/${params.boardId}`, {
