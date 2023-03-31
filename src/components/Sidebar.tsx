@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
-import { Drawer, List, ListItem, Box, Typography, IconButton, ListItemButton } from '@mui/material';
+import { Drawer, List, ListItem, Box, Typography, IconButton, ListItemButton, Avatar } from '@mui/material';
 import { LogoutOutlined, AddBoxOutlined } from '@mui/icons-material';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import FavouriteList from './FavouriteList';
@@ -129,9 +129,18 @@ function Sidebar(): JSX.Element {
 							justifyContent: 'space-between',
 						}}
 					>
-						<Typography variant="body2" fontWeight="700">
-							{user?.username ?? ''}
-						</Typography>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'space-between',
+							}}
+						>
+							<Avatar alt="avatar" src={user?.avatarUrl ?? ''} />
+							<Typography variant="body2" fontWeight="700" sx={{ marginLeft: '10px' }}>
+								{user?.username ?? ''}
+							</Typography>
+						</Box>
 						<IconButton onClick={handleLogout}>
 							<LogoutOutlined fontSize="small" />
 						</IconButton>
@@ -148,7 +157,7 @@ function Sidebar(): JSX.Element {
 						}}
 					>
 						<Typography variant="body2" fontWeight="700">
-							Private
+							Your boards
 						</Typography>
 						<IconButton onClick={() => { addBoard(); }}>
 							<AddBoxOutlined fontSize="small" />
