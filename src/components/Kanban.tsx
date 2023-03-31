@@ -4,11 +4,12 @@ import { Box, Button, Typography, Divider, TextField, IconButton, Card } from '@
 import { AddOutlined, DeleteOutlined } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import TaskModal from './TaskModal';
 import StrictModeDroppable from './common/StrictModeDroppable';
 
 import sectionApi from '../api/sectionApi';
 import taskApi from '../api/taskApi';
-import type { Section } from '../utils/types';
+import type { Section, Task } from '../utils/types';
 
 interface PropsType {
 	sections: Section[]
@@ -22,6 +23,7 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 	const timer = useRef<number>();
 
 	const [data, setData] = useState<Section[]>([]);
+	const [selectedTask, setSelectedTask] = useState<Task>();
 
 	useEffect(() => {
 		setData(sections);
@@ -122,6 +124,51 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 		}
 	};
 
+	const unselectTask = (): void => { setSelectedTask(undefined); };
+
+	const handleUpdateTask = async (task: Task): Promise<void> => {
+		clearTimeout(timer.current);
+		const newData = data.map((section) => {
+			if (section.tasks) {
+				const tasks = section.tasks.map((t) => (t.id === task.id ? task : t));
+				return { ...section, tasks };
+			}
+
+			return section;
+		});
+		setData(newData);
+
+		timer.current = window.setTimeout(() => {
+			const updateTask = async (): Promise<void> => {
+				try {
+					await taskApi.updateTask(boardId, task.id, { title: task.title, content: task.content });
+				} catch (error: any) {
+					enqueueSnackbar(error.message, { variant: 'error' });
+				}
+			};
+			updateTask();
+		}, TIME_OUT);
+	};
+
+	const handleDeleteTask = async (task: Task): Promise<void> => {
+		try {
+			await taskApi.deleteTask(boardId, task.id);
+
+			const newData = data.map((section) => {
+				if (section.tasks) {
+					const tasks = section.tasks.filter((t) => t.id !== task.id);
+					return { ...section, tasks };
+				}
+
+				return section;
+			});
+
+			setData(newData);
+		} catch (error: any) {
+			enqueueSnackbar(error.message, { variant: 'error' });
+		}
+	};
+
 	return (
 		<>
 			<Box
@@ -217,6 +264,7 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 																			marginBottom: '10px',
 																			cursor: snapshot.isDragging ? 'grab' : 'pointer!important',
 																		}}
+																		onClick={() => { setSelectedTask(task); }}
 																	>
 																		<Typography>
 																			{task.title === '' ? 'Untitled' : task.title}
@@ -237,6 +285,12 @@ function Kanban({ sections, boardId = '' }: PropsType): JSX.Element {
 					}
 				</Box>
 			</DragDropContext>
+			<TaskModal
+				task={selectedTask}
+				closeModal={unselectTask}
+				onUpdate={handleUpdateTask}
+				onDelete={handleDeleteTask}
+			/>
 		</>
 	);
 }

@@ -59,8 +59,9 @@ export interface Section {
 
 export interface Task {
 	id: string
-	section: string
+	section: Section
 	title: string
 	content: string
 	position: number
+	createdAt: datetime
 }
